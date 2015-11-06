@@ -2,4 +2,6 @@
 
 https://www.draw.io/#LArcMonsters.xml
 
+I am adding some things to the UML diagram that I think would be worthwhile.
+
 # 2. ??
