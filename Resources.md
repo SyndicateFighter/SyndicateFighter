@@ -10,3 +10,6 @@ something that will give us data for all the parks in us?
 
 # 3. Mind Map:
 https://www.mindmeister.com/608462159?t=LfGoKwWGPU
+
+# 4. A good guide:
+http://gamedevelopment.tutsplus.com/articles/how-to-build-a-jrpg-a-primer-for-game-developers--gamedev-6676
