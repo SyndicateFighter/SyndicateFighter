@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">SyndicateFighter</string>
+    <string name="app_id">1053404043381</string>
+    <string name="signin_other_error">There was na issue with the sign in, please try again later.</string>
+</resources>
