@@ -1,4 +1,7 @@
 apply plugin: 'com.android.application'
+apply plugin: 'com.github.dcendents.android-maven'
+
+group='com.github.jitpack'
 
 def props = new Properties()
 props.load(new FileInputStream(rootProject.file("debug.resource")))
@@ -43,4 +46,5 @@ dependencies {
     compile 'com.esri.arcgis.android:arcgis-android:10.2.7'
     compile project(':basegameutil')
     compile 'com.firebase:firebase-client-android:2.4.0+'
+    compile 'com.github.SyndicateFighter:ArcMonsters-monsters:0.1.4'
 }
