@@ -63,6 +63,7 @@ public class InitActivity extends FragmentActivity implements
         mFirebaseRef = new Firebase("https://amber-fire-1309.firebaseio.com/");
 
 
+
         // Create the Google API Client with access to Plus and Games
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
@@ -135,6 +136,8 @@ public class InitActivity extends FragmentActivity implements
                     Log.w(TAG, "Recoverable Google OAuth error: " + e.toString());
                     /* We probably need to ask for permissions, so start the intent if there is none pending */
                     if (!mGoogleIntentInProgress) {
+
+                        //TODO this needs to be modified in the future!!!
                         mGoogleIntentInProgress = true;
                         Intent recover = e.getIntent();
                         startActivityForResult(recover, FighterMap.RC_GOOGLE_LOGIN);
@@ -155,6 +158,8 @@ public class InitActivity extends FragmentActivity implements
                 Intent resultIntent = new Intent();
                 if (token != null) {
 
+
+                    //TODO this will need to be moved to appropriate section, most likely main game activity in the future
                     mFirebaseRef.authWithOAuthToken("google", token, new Firebase.AuthResultHandler() {
                         @Override
                         public void onAuthenticated(AuthData authData) {

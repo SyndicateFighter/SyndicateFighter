@@ -19,7 +19,10 @@ allprojects {
 
         maven {
             url 'https://esri.bintray.com/arcgis'
-            url "https://jitpack.io"
+
+        }
+        maven {
+            url 'https://jitpack.io'
         }
     }
 
