@@ -30,7 +30,6 @@ public class MainGameActivity extends AppCompatActivity {
         //Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         //setSupportActionBar(toolbar);
 
-        Intent intent = getIntent();
         Bundle extras = getIntent().getExtras();
         if(extras!=null){
             //Check which intent started this activity
