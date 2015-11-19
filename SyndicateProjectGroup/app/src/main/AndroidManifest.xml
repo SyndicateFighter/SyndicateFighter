@@ -49,6 +49,14 @@
             android:label="@string/title_activity_main_game"
             android:theme="@style/AppTheme.NoActionBar" >
         </activity>
+        <activity
+            android:name=".SettingsActivity"
+            android:label="@string/title_activity_settings"
+            android:parentActivityName=".MainGameActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.arcfighter.syndicateprojectgroup.MainGameActivity" />
+        </activity>
     </application>
 
 </manifest>
