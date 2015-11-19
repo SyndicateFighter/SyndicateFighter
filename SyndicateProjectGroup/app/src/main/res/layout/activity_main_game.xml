@@ -59,7 +59,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <!-- Reminder -->
+                <!-- Settings  -->
                 <TextView
                     android:id="@+id/fab_sheet_item_setting"
                     style="@style/TextAppearance.MaterialSheetFab.Sheet.Item"
@@ -67,6 +67,26 @@
                     android:drawableStart="@drawable/ic_setting_light"
                     android:text="@string/settings"
                     android:contextClickable="true" />
+
+                <!-- Settings  -->
+                <TextView
+                    android:id="@+id/fab_sheet_item_backpack"
+                    style="@style/TextAppearance.MaterialSheetFab.Sheet.Item"
+                    android:drawableLeft="@android:drawable/ic_menu_manage"
+                    android:drawableStart="@android:drawable/ic_menu_manage"
+                    android:text="@string/backpack"
+                    android:contextClickable="true"
+                    android:editable="true" />
+
+                <!-- Settings  -->
+                <TextView
+                    android:id="@+id/fab_sheet_item_team"
+                    style="@style/TextAppearance.MaterialSheetFab.Sheet.Item"
+                    android:drawableLeft="@android:drawable/ic_menu_myplaces"
+                    android:drawableStart="@android:drawable/ic_menu_myplaces"
+                    android:text="@string/team"
+                    android:contextClickable="true"
+                    android:editable="false" />
 
             </LinearLayout>
 

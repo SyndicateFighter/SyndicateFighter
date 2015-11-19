@@ -108,6 +108,22 @@ public class MainGameActivity extends AppCompatActivity {
                 startActivity(settingsIntent);
             }
         });
+
+        findViewById(R.id.fab_sheet_item_backpack).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent settingsIntent = new Intent(MainGameActivity.this,TeamActivity.class);
+                startActivity(settingsIntent);
+            }
+        });
+
+        findViewById(R.id.fab_sheet_item_team).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent settingsIntent = new Intent(MainGameActivity.this, TeamActivity.class);
+                startActivity(settingsIntent);
+            }
+        });
     }
 
     @Override

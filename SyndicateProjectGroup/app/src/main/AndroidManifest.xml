@@ -57,6 +57,10 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.arcfighter.syndicateprojectgroup.MainGameActivity" />
         </activity>
+        <activity android:name=".Trigger.BackpackActivity" >
+        </activity>
+        <activity android:name=".TeamActivity" >
+        </activity>
     </application>
 
 </manifest>
