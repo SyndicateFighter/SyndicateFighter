@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 
+import com.esri.android.map.LocationDisplayManager;
 import com.esri.android.map.MapView;
 import com.esri.android.map.event.OnStatusChangedListener;
 import com.gordonwong.materialsheetfab.MaterialSheetFab;
@@ -20,6 +21,8 @@ public class MainGameActivity extends AppCompatActivity {
     private Location mLocation;
 
     private MaterialSheetFab materialSheetFab;
+
+    private LocationDisplayManager locationDisplayManager;
 
     //TODO move firebase auth to here
 
@@ -65,7 +68,13 @@ public class MainGameActivity extends AppCompatActivity {
             @Override
             public void onStatusChanged(Object o, STATUS status) {
                 if(status == STATUS.INITIALIZED){
-                    fighterMapView.centerAndZoom(mLocation.getLatitude(),mLocation.getLongitude(),15);
+                    if(mLocation!=null) {
+                        fighterMapView.centerAndZoom(mLocation.getLatitude(), mLocation.getLongitude(), 15);
+                        locationDisplayManager = fighterMapView.getLocationDisplayManager();
+                        locationDisplayManager.setAutoPanMode(LocationDisplayManager.AutoPanMode.OFF);
+                    }else{
+                        //TODO get mlocation from local storage, the map should always zoom back to the last known location of the user
+                    }
                 }
             }
         });
@@ -92,7 +101,13 @@ public class MainGameActivity extends AppCompatActivity {
         });
 
         // TODO Set material sheet item click listeners
-        //findViewById(R.id.fab_sheet_item_setting).setOnClickListener(this);
+        findViewById(R.id.fab_sheet_item_setting).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent settingsIntent = new Intent(MainGameActivity.this,SettingsActivity.class);
+                startActivity(settingsIntent);
+            }
+        });
     }
 
     @Override
