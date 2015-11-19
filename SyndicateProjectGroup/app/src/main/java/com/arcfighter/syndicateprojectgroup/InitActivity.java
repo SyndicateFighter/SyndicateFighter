@@ -1,6 +1,7 @@
 package com.arcfighter.syndicateprojectgroup;
 
 import android.content.Intent;
+import android.location.Location;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v4.app.Fragment;
@@ -20,6 +21,7 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.games.Games;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.plus.Plus;
 
 import java.io.IOException;
@@ -46,6 +48,9 @@ public class InitActivity extends FragmentActivity implements
 
     public static final String INIT_LAUNCH= "InitialLaunch";
 
+
+    private Location mLocation;
+
     /* A reference to the Firebase */
     //TODO THIS NEEDS TO BE MOVED ELSE WHERE IN THE FUTURE!!
     private Firebase mFirebaseRef;
@@ -70,6 +75,7 @@ public class InitActivity extends FragmentActivity implements
                 .addOnConnectionFailedListener(this)
                 .addApi(Plus.API).addScope(Plus.SCOPE_PLUS_LOGIN)
                 .addApi(Games.API).addScope(Games.SCOPE_GAMES)
+                .addApi(LocationServices.API)
                 .build();
 
         if(mAutoStartSignInflow) {
@@ -82,6 +88,10 @@ public class InitActivity extends FragmentActivity implements
 
     @Override
     public void onConnected(Bundle bundle) {
+
+
+        mLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+
         //Player is signed in, proceed to game load and fighter map activity
         Toast.makeText(this,"SIGNED IN!",Toast.LENGTH_SHORT).show();
         getGoogleOAuthTokenAndLogin();
@@ -140,7 +150,7 @@ public class InitActivity extends FragmentActivity implements
                         //TODO this needs to be modified in the future!!!
                         mGoogleIntentInProgress = true;
                         Intent recover = e.getIntent();
-                        startActivityForResult(recover, FighterMap.RC_GOOGLE_LOGIN);
+                        //startActivityForResult(recover, FighterMap.RC_GOOGLE_LOGIN);
                     }
                 } catch (GoogleAuthException authEx) {
                     /* The call is not ever expected to succeed assuming you have already verified that
@@ -155,25 +165,34 @@ public class InitActivity extends FragmentActivity implements
             @Override
             protected void onPostExecute(String token) {
                 //mGoogleLoginClicked = false;
-                Intent resultIntent = new Intent();
+                Intent resultIntent = new Intent(InitActivity.this,MainGameActivity.class);
                 if (token != null) {
 
 
-                    //TODO this will need to be moved to appropriate section, most likely main game activity in the future
-                    mFirebaseRef.authWithOAuthToken("google", token, new Firebase.AuthResultHandler() {
-                        @Override
-                        public void onAuthenticated(AuthData authData) {
-                            Log.e(TAG, "Authenticated with FIREBASE");
-                            Toast.makeText(InitActivity.this, "Authenticated with FIREBASE", Toast.LENGTH_SHORT).show();
-                        }
+//                    //TODO this will need to be moved to appropriate section, most likely main game activity in the future
+//                    mFirebaseRef.authWithOAuthToken("google", token, new Firebase.AuthResultHandler() {
+//                        @Override
+//                        public void onAuthenticated(AuthData authData) {
+//                            Log.e(TAG, "Authenticated with FIREBASE");
+//                            Toast.makeText(InitActivity.this, "Authenticated with FIREBASE", Toast.LENGTH_SHORT).show();
+//
+//
+//                        }
+//
+//                        @Override
+//                        public void onAuthenticationError(FirebaseError firebaseError) {
+//                            Log.e(TAG, "NOT Authenticated with FIREBASE");
+//                            Toast.makeText(InitActivity.this, "NOT Authenticated with FIREBASE", Toast.LENGTH_SHORT).show();
+//                        }
+//                    });
 
-                        @Override
-                        public void onAuthenticationError(FirebaseError firebaseError) {
-                            Log.e(TAG, "NOT Authenticated with FIREBASE");
-                            Toast.makeText(InitActivity.this, "NOT Authenticated with FIREBASE", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                    //resultIntent.putExtra("oauth_token", token);
+                    //TODO in the future keys will need to be obatined from the xml
+                    resultIntent.putExtra("fromactivity", "InitActivity");
+                    resultIntent.putExtra("oauth_token", token);
+                    resultIntent.putExtra("location", mLocation);
+//                    startService(resultIntent);
+                    startActivity(resultIntent);
+
                 } else if (errorMessage != null) {
                     Log.e(TAG, "no token");
                     //resultIntent.putExtra("error", errorMessage);

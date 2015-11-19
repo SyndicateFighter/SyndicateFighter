@@ -44,7 +44,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".FighterMap" >
+        <activity
+            android:name=".MainGameActivity"
+            android:label="@string/title_activity_main_game"
+            android:theme="@style/AppTheme.NoActionBar" >
         </activity>
     </application>
 
