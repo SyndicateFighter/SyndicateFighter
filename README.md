@@ -9,7 +9,7 @@ http://lhartikk.github.io/ArnoldC/
 OK, everything is now in ArnoldC!
 
 Using:
-Gradle 1.3
-compileSdkVersion 23
-buildToolsVersion "23.0.2"
-Android Studio 1.4.1
+* Gradle 1.3
+* compileSdkVersion 23
+* buildToolsVersion "23.0.2"
+* Android Studio 1.4.1
