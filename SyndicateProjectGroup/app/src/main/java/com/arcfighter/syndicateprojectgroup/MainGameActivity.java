@@ -2,6 +2,7 @@ package com.arcfighter.syndicateprojectgroup;
 
 import android.content.Intent;
 import android.location.Location;
+import android.location.LocationListener;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -68,13 +69,41 @@ public class MainGameActivity extends AppCompatActivity {
             @Override
             public void onStatusChanged(Object o, STATUS status) {
                 if(status == STATUS.INITIALIZED){
-                    if(mLocation!=null) {
-                        fighterMapView.centerAndZoom(mLocation.getLatitude(), mLocation.getLongitude(), 15);
+                    //if(mLocation!=null) {
+                        //fighterMapView.centerAndZoom(mLocation.getLatitude(), mLocation.getLongitude(), 15);
                         locationDisplayManager = fighterMapView.getLocationDisplayManager();
-                        locationDisplayManager.setAutoPanMode(LocationDisplayManager.AutoPanMode.OFF);
-                    }else{
-                        //TODO get mlocation from local storage, the map should always zoom back to the last known location of the user
-                    }
+                        locationDisplayManager.setLocationListener(new LocationListener() {
+                            boolean locationChanged = false;
+
+                            @Override
+                            public void onLocationChanged(Location location) {
+                                if(!locationChanged) {
+                                    locationChanged = true;
+                                    fighterMapView.centerAndZoom(location.getLatitude(), location.getLongitude(), 16);
+                                    locationDisplayManager.setAutoPanMode(LocationDisplayManager.AutoPanMode.OFF);
+                                }
+                            }
+
+                            @Override
+                            public void onStatusChanged(String provider, int status, Bundle extras) {
+
+                            }
+
+                            @Override
+                            public void onProviderEnabled(String provider) {
+
+                            }
+
+                            @Override
+                            public void onProviderDisabled(String provider) {
+
+                            }
+                        });
+                        locationDisplayManager.start();
+
+                    //}else{
+                        ////TODO get mlocation from local storage, the map should always zoom back to the last known location of the user
+                    //}
                 }
             }
         });

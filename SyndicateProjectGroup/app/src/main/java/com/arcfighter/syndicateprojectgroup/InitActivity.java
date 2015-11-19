@@ -198,7 +198,7 @@ public class InitActivity extends FragmentActivity implements
                     //resultIntent.putExtra("error", errorMessage);
                 }
                 //setResult(FighterMap.RC_GOOGLE_LOGIN, resultIntent);
-                //finish();
+                finish();
             }
         };
         task.execute();
