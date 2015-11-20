@@ -20,6 +20,7 @@ public class Triggers {
 
     protected Location currentLocation;
     protected Graphic[] nearbyTriggers;
+    protected Point[] nearbyTriggerPointsWGS;
 
     public Triggers (Location mcurrentLocation){
         this.currentLocation = mcurrentLocation;
@@ -32,6 +33,7 @@ public class Triggers {
         Symbol polysym = new SimpleFillSymbol(Color.BLUE);
 
         Graphic[] mnearbyTriggers = new Graphic[25];
+        nearbyTriggerPointsWGS = new Point[25];
 
         double currentLat = mcurrentLocation.getLatitude();
         double currentLong = mcurrentLocation.getLongitude();
@@ -54,7 +56,17 @@ public class Triggers {
                 Point p = new Point((xfactor*1600), (yfactor*1600));
                 Polygon poly = GeometryEngine.buffer(p, SpatialReference.create(3857), 400, Unit.create(LinearUnit.Code.METER));
                 Graphic g = new Graphic(poly,polysym);
-                mnearbyTriggers[(i*5)+j]= g;
+
+                Point wgsP = (Point) GeometryEngine.project(p,SpatialReference.create(3857), SpatialReference.create(4326));
+
+                int pos = (i*5)+j;
+
+                //TODO this is probably not the best way to init nearbyTriggerPointsWGS
+                nearbyTriggerPointsWGS[pos]= wgsP;
+
+                //good for mnearbyTriggers though
+                mnearbyTriggers[pos]= g;
+
                 yfactor++;
             }
             xfactor++;
@@ -67,5 +79,7 @@ public class Triggers {
     public Graphic[] getNearbyTriggers(){
         return nearbyTriggers;
     }
+
+    public Point[] getNearbyTriggerPointsWGS(){ return nearbyTriggerPointsWGS;}
 
 }

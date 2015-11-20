@@ -5,10 +5,7 @@ import android.content.SharedPreferences;
 import android.location.Location;
 import android.location.LocationListener;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -18,6 +15,7 @@ import com.esri.android.map.GraphicsLayer;
 import com.esri.android.map.LocationDisplayManager;
 import com.esri.android.map.MapView;
 import com.esri.android.map.event.OnStatusChangedListener;
+import com.esri.core.geometry.Point;
 import com.esri.core.map.Graphic;
 import com.firebase.client.AuthData;
 import com.firebase.client.Firebase;
@@ -44,6 +42,10 @@ public class MainGameActivity extends AppCompatActivity {
     private Firebase mFirebaseRef;
 
     private GraphicsLayer triggerGraphicsLayer;
+
+    private Triggers nearByTriggers;
+
+    private Point[] nearbyTriggerPointsWGS;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -131,8 +133,10 @@ public class MainGameActivity extends AppCompatActivity {
                                 if(!locationChanged) {
                                     //on first launch of the locationchanged
 
-                                    //TODO display the nearby triggers
-                                    showNearByTriggers(location);
+                                    //TODO display the nearby nearByTriggers
+                                    //TODO this might be moved to initActivity in the future to optimize performance
+                                    getNearByTriggers(location);
+                                    showNearByTriggers();
 
                                     Log.e(TAG, "first location log");
                                     double lastLat = Double.longBitsToDouble(mainPreference.getLong("lastSigLat",0));
@@ -173,11 +177,15 @@ public class MainGameActivity extends AppCompatActivity {
         });
     }
 
-    private void showNearByTriggers(Location location) {
-        Triggers triggers = new Triggers(location);
-        Graphic[] nearbyTriggers = triggers.getNearbyTriggers();
+    private void getNearByTriggers(Location location){
+        nearByTriggers = new Triggers(location);
+        nearbyTriggerPointsWGS = nearByTriggers.getNearbyTriggerPointsWGS();
+    }
+    private void showNearByTriggers() {
 
-        //TODO make triggergraphiclayer pretty either here or in triggers java, here is probably better
+        Graphic[] nearbyTriggers = nearByTriggers.getNearbyTriggers();
+
+        //TODO make triggergraphiclayer pretty either here or in nearByTriggers java, here is probably better
         triggerGraphicsLayer.addGraphics(nearbyTriggers);
     }
 
