@@ -44,16 +44,12 @@ public class InitActivity extends FragmentActivity implements
     private boolean mGoogleIntentInProgress;
 
     private static final String TAG = InitActivity.class.getSimpleName();
-
-
     public static final String INIT_LAUNCH= "InitialLaunch";
 
 
     private Location mLocation;
 
-    /* A reference to the Firebase */
-    //TODO THIS NEEDS TO BE MOVED ELSE WHERE IN THE FUTURE!!
-    private Firebase mFirebaseRef;
+
 
 
 
@@ -63,9 +59,6 @@ public class InitActivity extends FragmentActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_init);
 
-        //TODO THIS NEEDS TO BE MOVED IN FUTURE!!!
-        /* Create the Firebase ref that is used for all authentication with Firebase */
-        mFirebaseRef = new Firebase("https://amber-fire-1309.firebaseio.com/");
 
 
 

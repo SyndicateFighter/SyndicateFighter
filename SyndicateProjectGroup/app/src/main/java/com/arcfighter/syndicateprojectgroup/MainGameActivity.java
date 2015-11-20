@@ -1,6 +1,7 @@
 package com.arcfighter.syndicateprojectgroup;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.location.Location;
 import android.location.LocationListener;
 import android.os.Bundle;
@@ -8,24 +9,41 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
+import com.arcfighter.syndicateprojectgroup.Triggers.Triggers;
+import com.esri.android.map.GraphicsLayer;
 import com.esri.android.map.LocationDisplayManager;
 import com.esri.android.map.MapView;
 import com.esri.android.map.event.OnStatusChangedListener;
+import com.esri.core.map.Graphic;
+import com.firebase.client.AuthData;
+import com.firebase.client.Firebase;
+import com.firebase.client.FirebaseError;
 import com.gordonwong.materialsheetfab.MaterialSheetFab;
 import com.gordonwong.materialsheetfab.MaterialSheetFabEventListener;
 
 public class MainGameActivity extends AppCompatActivity {
 
     private MapView fighterMapView;
-    private Location mLocation;
+    private Location mLastSignificantLocation;
 
     private MaterialSheetFab materialSheetFab;
 
     private LocationDisplayManager locationDisplayManager;
 
-    //TODO move firebase auth to here
+    private SharedPreferences mainPreference;
+    private SharedPreferences.Editor mainPreferenceEditor;
+
+    private final String MAIN_PREF = "MAIN_PREF_FILE";
+
+    private static final String TAG = "SYNMAIN";
+
+    private Firebase mFirebaseRef;
+
+    private GraphicsLayer triggerGraphicsLayer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,23 +52,56 @@ public class MainGameActivity extends AppCompatActivity {
         //Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         //setSupportActionBar(toolbar);
 
+
+
+
+        mainPreference = getSharedPreferences(MAIN_PREF,0);
+        mainPreferenceEditor = mainPreference.edit();
+
+        /* Create the Firebase ref that is used for all authentication with Firebase */
+        mFirebaseRef = new Firebase("https://amber-fire-1309.firebaseio.com/");
+
         Bundle extras = getIntent().getExtras();
         if(extras!=null){
             //Check which intent started this activity
 
             //if the signin page started this activity
             if(extras.getString("fromactivity").equals("InitActivity")){
-                mLocation = extras.getParcelable("location");
 
-                //TODO save the mlocation to secured location on device
+                String token = extras.getString("oauth_token");
+                mFirebaseRef.authWithOAuthToken("google", token, new Firebase.AuthResultHandler() {
+                        @Override
+                        public void onAuthenticated(AuthData authData) {
+                            Log.e(TAG, "Authenticated with FIREBASE");
+                            Toast.makeText(MainGameActivity.this, "Authenticated with FIREBASE", Toast.LENGTH_SHORT).show();
+                            //TODO someone do something with firebase?
+                        }
 
-                //TODO firebase auth
+                        @Override
+                        public void onAuthenticationError(FirebaseError firebaseError) {
+                            Log.e(TAG, "NOT Authenticated with FIREBASE");
+                            Toast.makeText(MainGameActivity.this, "NOT Authenticated with FIREBASE", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+
+                //TODO save the mlocation to secured location on device - DONE
+                //TODO update 11/19 this part with mLastSignificantLocation may not be necessary? not sure yet
+                //since android cannot store double, use long http://stackoverflow.com/questions/16319237/cant-put-double-sharedpreferences
+                //get from long to double by using:
+                //Double.longBitsToDouble(XXX);
+                mLastSignificantLocation = extras.getParcelable("location");
+
+                mainPreferenceEditor.putLong("lastSigLat", Double.doubleToLongBits(mLastSignificantLocation.getLatitude()));
+                mainPreferenceEditor.putLong("lastSigLong", Double.doubleToLongBits(mLastSignificantLocation.getLongitude()));
 
             }
 
         }
 
         fighterMapView = (MapView) findViewById(R.id.fightermap);
+        triggerGraphicsLayer = new GraphicsLayer();
+        fighterMapView.addLayer(triggerGraphicsLayer);
 
 
 //        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -78,8 +129,20 @@ public class MainGameActivity extends AppCompatActivity {
                             @Override
                             public void onLocationChanged(Location location) {
                                 if(!locationChanged) {
+                                    //on first launch of the locationchanged
+
+                                    //TODO display the nearby triggers
+                                    showNearByTriggers(location);
+
+                                    Log.e(TAG, "first location log");
+                                    double lastLat = Double.longBitsToDouble(mainPreference.getLong("lastSigLat",0));
+                                    double lastLong = Double.longBitsToDouble(mainPreference.getLong("lastSigLong",0));
+
+                                    //TODO need comparison to see if current location is significantly further away than the last point
+                                    //if it is, then update the Preference for the location
+
                                     locationChanged = true;
-                                    fighterMapView.centerAndZoom(location.getLatitude(), location.getLongitude(), 16);
+                                    fighterMapView.centerAndZoom(location.getLatitude(), location.getLongitude(), 18);
                                     locationDisplayManager.setAutoPanMode(LocationDisplayManager.AutoPanMode.OFF);
                                 }
                             }
@@ -103,10 +166,19 @@ public class MainGameActivity extends AppCompatActivity {
 
                     //}else{
                         ////TODO get mlocation from local storage, the map should always zoom back to the last known location of the user
+                        ////TODO update 11/19 may not be needed?
                     //}
                 }
             }
         });
+    }
+
+    private void showNearByTriggers(Location location) {
+        Triggers triggers = new Triggers(location);
+        Graphic[] nearbyTriggers = triggers.getNearbyTriggers();
+
+        //TODO make triggergraphiclayer pretty either here or in triggers java, here is probably better
+        triggerGraphicsLayer.addGraphics(nearbyTriggers);
     }
 
     private void setupFab(){
