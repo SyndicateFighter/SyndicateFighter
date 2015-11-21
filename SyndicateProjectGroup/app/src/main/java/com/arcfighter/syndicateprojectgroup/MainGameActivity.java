@@ -138,6 +138,10 @@ public class MainGameActivity extends AppCompatActivity {
                                     getNearByTriggers(location);
                                     showNearByTriggers();
 
+                                    //TODO generate the geofences here!
+                                    createGeofencesfromTriggerPoints();
+
+
                                     Log.e(TAG, "first location log");
                                     double lastLat = Double.longBitsToDouble(mainPreference.getLong("lastSigLat",0));
                                     double lastLong = Double.longBitsToDouble(mainPreference.getLong("lastSigLong",0));
@@ -146,7 +150,7 @@ public class MainGameActivity extends AppCompatActivity {
                                     //if it is, then update the Preference for the location
 
                                     locationChanged = true;
-                                    fighterMapView.centerAndZoom(location.getLatitude(), location.getLongitude(), 18);
+                                    fighterMapView.centerAndZoom(location.getLatitude(), location.getLongitude(), 17);
                                     locationDisplayManager.setAutoPanMode(LocationDisplayManager.AutoPanMode.OFF);
                                 }
                             }
@@ -175,6 +179,10 @@ public class MainGameActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    private void createGeofencesfromTriggerPoints() {
+
     }
 
     private void getNearByTriggers(Location location){

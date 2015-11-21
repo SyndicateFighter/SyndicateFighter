@@ -47,8 +47,8 @@ public class Triggers {
         //TODO what is the max number possible for x and y? so we can wrap around?
         //also feels like this won't work for north/south pole very well
         //For now just +/-
-        int xfactor = (currentx/1600)-2;
-        int yfactor = (currenty/1600)-2;
+        int xfactor = ((int)Math.round(currentx / 1600.0)) -2;
+        int yfactor = ((int)Math.round(currenty / 1600.0)) -2;
 
         for(int i=0; i<5; i++){
             for(int j=0; j<5; j++){
