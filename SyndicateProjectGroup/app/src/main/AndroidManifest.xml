@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.arcfighter.syndicateprojectgroup" >
+    package="com.arcfighter.syndicateprojectgroup">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
@@ -27,7 +27,7 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme">
         <meta-data
             android:name="com.google.android.gms.games.APP_ID"
             android:value="@string/app_id" />
@@ -37,7 +37,7 @@
 
         <activity
             android:name=".InitActivity"
-            android:configChanges="orientation|keyboardHidden|screenSize" >
+            android:configChanges="orientation|keyboardHidden|screenSize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -47,20 +47,21 @@
         <activity
             android:name=".MainGameActivity"
             android:label="@string/title_activity_main_game"
-            android:theme="@style/AppTheme.NoActionBar" >
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar"></activity>
         <activity
             android:name=".SettingsActivity"
             android:label="@string/title_activity_settings"
-            android:parentActivityName=".MainGameActivity" >
+            android:parentActivityName=".MainGameActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.arcfighter.syndicateprojectgroup.MainGameActivity" />
         </activity>
-        <activity android:name=".Triggers.BackpackActivity" >
-        </activity>
-        <activity android:name=".TeamActivity" >
-        </activity>
+        <activity android:name=".Triggers.BackpackActivity"></activity>
+        <activity android:name=".TeamActivity"></activity>
+
+        <service
+            android:name=".geofence.GeofenceTransitionsIntentService"
+            android:exported="false"></service>
     </application>
 
 </manifest>
