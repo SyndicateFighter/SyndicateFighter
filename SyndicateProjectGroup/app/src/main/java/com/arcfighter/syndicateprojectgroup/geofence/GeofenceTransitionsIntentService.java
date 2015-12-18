@@ -128,8 +128,12 @@ public class GeofenceTransitionsIntentService extends IntentService {
             * If the user clicks the notification, control goes to the MainActivity.
             */
     private void sendNotification(String notificationDetails) {
-        // Create an explicit content Intent that starts the main Activity.
+
+        // Create an explicit content Intent that starts the main game Activity.
+        //TODO consider maybe a new activity to hold a list of all events or challenges??
         Intent notificationIntent = new Intent(getApplicationContext(), MainGameActivity.class);
+
+        notificationIntent.putExtra("fromactivity", "GeofenceTransitionsIntentService");
 
         // Construct a task stack.
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
