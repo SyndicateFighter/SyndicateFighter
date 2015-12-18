@@ -19,11 +19,14 @@ import com.esri.android.map.GraphicsLayer;
 import com.esri.android.map.LocationDisplayManager;
 import com.esri.android.map.MapView;
 import com.esri.android.map.event.OnStatusChangedListener;
+import com.esri.core.geometry.GeometryEngine;
 import com.esri.core.geometry.Point;
+import com.esri.core.geometry.SpatialReference;
 import com.esri.core.map.Graphic;
 import com.firebase.client.AuthData;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
+import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
@@ -38,7 +41,7 @@ import com.gordonwong.materialsheetfab.MaterialSheetFabEventListener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainGameActivity extends AppCompatActivity implements ResultCallback<Status> {
+public class MainGameActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,ResultCallback<Status> {
 
     // Client used to interact with Google APIs
     private GoogleApiClient mainGoogleApiClient;
@@ -69,29 +72,36 @@ public class MainGameActivity extends AppCompatActivity implements ResultCallbac
 
     private PendingIntent mGeofencePendingIntent;
 
+    private boolean needToUpdateTriggers = false;
+
+    private boolean startedFromNotification = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //Layout may change depending on how activity is launched
         setContentView(R.layout.activity_main_game);
-        //Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        //setSupportActionBar(toolbar);
 
 
+        //getting the user preferences
         mainPreference = getSharedPreferences(MAIN_PREF, 0);
         mainPreferenceEditor = mainPreference.edit();
+
         // Empty list for storing geofences.
         mGeofenceList = new ArrayList<Geofence>();
 
         mainGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
                 .addApi(Plus.API).addScope(Plus.SCOPE_PLUS_LOGIN)
                 .addApi(Games.API).addScope(Games.SCOPE_GAMES)
                 .addApi(LocationServices.API)
                 .build();
-//        mainGoogleApiClient.connect();
 
 
         /* Create the Firebase ref that is used for all authentication with Firebase */
         //TODO doing some more reading, not sure if firebaseref should be implemented at activity level or application level, currently at application level for now
+        //TODO Constant for URL
         mFirebaseRef = new Firebase("https://amber-fire-1309.firebaseio.com/");
 
         Bundle extras = getIntent().getExtras();
@@ -99,7 +109,10 @@ public class MainGameActivity extends AppCompatActivity implements ResultCallbac
             //Check which intent started this activity
 
             //if the signin page started this activity
+            //TODO constant for fromactivity, initactivity, GeofenceTransitionsIntentService
             if(extras.getString("fromactivity").equals("InitActivity")){
+
+//                needToUpdateTriggers = true;//TODO need to consider if this is the best approach (sometimes google sign in is quick and does not allow map location to be loaded first)
 
                 String token = extras.getString("oauth_token");
                 mFirebaseRef.authWithOAuthToken("google", token, new Firebase.AuthResultHandler() {
@@ -118,16 +131,21 @@ public class MainGameActivity extends AppCompatActivity implements ResultCallbac
                     });
 
 
-                //TODO save the mlocation to secured location on device - DONE
-                //TODO update 11/19 this part with mLastSignificantLocation may not be necessary? not sure yet
-                //since android cannot store double, use long http://stackoverflow.com/questions/16319237/cant-put-double-sharedpreferences
-                //get from long to double by using:
-                //Double.longBitsToDouble(XXX);
-                mLastSignificantLocation = extras.getParcelable("location");
+//                //TODO save the mlocation to secured location on device - DONE
+//                //TODO update 11/19 this part with mLastSignificantLocation may not be necessary? not sure yet
+//                //since android cannot store double, use long http://stackoverflow.com/questions/16319237/cant-put-double-sharedpreferences
+//                //get from long to double by using:
+//                //Double.longBitsToDouble(XXX);
+//                mLastSignificantLocation = extras.getParcelable("location");
+//                mainPreferenceEditor.putLong("lastSigLat", Double.doubleToLongBits(mLastSignificantLocation.getLatitude()));
+//                mainPreferenceEditor.putLong("lastSigLong", Double.doubleToLongBits(mLastSignificantLocation.getLongitude()));
 
-                mainPreferenceEditor.putLong("lastSigLat", Double.doubleToLongBits(mLastSignificantLocation.getLatitude()));
-                mainPreferenceEditor.putLong("lastSigLong", Double.doubleToLongBits(mLastSignificantLocation.getLongitude()));
+            }else if(extras.getString("fromactivity").equals("GeofenceTransitionsIntentService")){
 
+                //NOTE this probably will be taken care of in a different activity in the future!!!
+                needToUpdateTriggers = false;
+                startedFromNotification = true;
+                Log.i(TAG, "FROM NOTIFICATION");
             }
 
         }
@@ -162,30 +180,103 @@ public class MainGameActivity extends AppCompatActivity implements ResultCallbac
                             @Override
                             public void onLocationChanged(Location location) {
                                 if(!locationChanged) {
-                                    //on first launch of the locationchanged
+                                    //on first launch of the locationchanged, everytime the activity is launched
 
-                                    //TODO display the nearby nearByTriggers
-                                    //TODO this might be moved to initActivity in the future to optimize performance
-                                    getNearByTriggers(location);
-                                    showNearByTriggers();
+                                    if(!startedFromNotification) {
+                                        needToUpdateTriggers = true;
+
+                                        getNearByTriggers(location);
+                                        showNearByTriggers();
+                                        createGeofencesfromTriggerPoints();
+
+                                        //get current location, and store it into lastSigLat and lastSigLong
+                                        mainPreferenceEditor.putLong("lastSigLat", Double.doubleToLongBits(location.getLatitude()));
+                                        mainPreferenceEditor.putLong("lastSigLong", Double.doubleToLongBits(location.getLongitude()));
+
+                                        mainPreferenceEditor.apply();//might want to use commit in the future
+
+                                    }else{
+
+                                        //Don't need to udpate, probably from notification
+                                        Log.i(TAG, "currentlatlog"+location.getLatitude()+ ", "+location.getLongitude());
+
+                                        double lastLat = Double.longBitsToDouble(mainPreference.getLong("lastSigLat",0));
+                                        double lastLong = Double.longBitsToDouble(mainPreference.getLong("lastSigLong",0));
+                                        Log.i(TAG,"test"+lastLat+" "+lastLong);
+
+                                        Location oldlocation = new Location(location);
+                                        oldlocation.setLatitude(lastLat);
+                                        oldlocation.setLongitude(lastLong);
 
 
-                                    createGeofencesfromTriggerPoints();
-                                    addGeofence();
-//                                    try {
-//                                        LocationServices.GeofencingApi.addGeofences(mainGoogleApiClient, getGeofenceingRequest(), getGeofencePendingIntent()).setResultCallback(this);
-//                                    }catch (IntentSender.SendIntentException securityException){
-//
-//                                    }
+                                        Log.i(TAG, "currentlatlog" + location.getLatitude() + ", " + location.getLongitude());
+                                        Log.i(TAG, "oldlatlog"+oldlocation.getLatitude()+ ", "+oldlocation.getLongitude());
+
+                                        Point currentpoint = (Point) GeometryEngine.project(location.getLongitude(), location.getLatitude(), SpatialReference.create(3857));
+                                        Point oldpoint = (Point) GeometryEngine.project(oldlocation.getLongitude(), oldlocation.getLatitude(), SpatialReference.create(3857));
 
 
-                                    Log.e(TAG, "first location log");
+                                        double xdiff = Math.abs(currentpoint.getX() - oldpoint.getX());
+                                        double ydiff =  Math.abs(currentpoint.getY()-oldpoint.getY());
+
+                                        Log.i(TAG, "diffs"+ xdiff+" "+ydiff);
+
+
+                                        //TODO not able to test the accuracy of math here, faking my location doesn't seem to register correctly, still taking my real position
+                                        if(Math.pow(xdiff, 2)+Math.pow(ydiff,2)>9000000) {
+                                            Log.i(TAG, "hypo greater");
+                                            needToUpdateTriggers = true;
+                                        }else if(xdiff >3200){
+                                            Log.i(TAG, "X greater");
+                                            needToUpdateTriggers = true;
+
+                                        }else if(ydiff>3200){
+                                            Log.i(TAG, "Y greater");
+                                            needToUpdateTriggers = true;
+                                        }
+
+
+                                        //create new if needed, else keep the old ones
+                                        if(needToUpdateTriggers){
+                                            //get current location, and store it into lastSigLat and lastSigLong
+                                            mainPreferenceEditor.putLong("lastSigLat", Double.doubleToLongBits(location.getLatitude()));
+                                            mainPreferenceEditor.putLong("lastSigLong", Double.doubleToLongBits(location.getLongitude()));
+                                            mainPreferenceEditor.apply();//might want to use commit in the future
+
+                                            getNearByTriggers(location);
+                                            showNearByTriggers();
+
+                                            createGeofencesfromTriggerPoints();
+                                        }else{
+
+                                            //get current location, and store it into lastSigLat and lastSigLong
+                                            mainPreferenceEditor.putLong("lastSigLat", Double.doubleToLongBits(oldlocation.getLatitude()));
+                                            mainPreferenceEditor.putLong("lastSigLong", Double.doubleToLongBits(oldlocation.getLongitude()));
+                                            mainPreferenceEditor.apply();//might want to use commit in the future
+
+                                            getNearByTriggers(oldlocation);
+                                            showNearByTriggers();
+                                        }
+
+                                    }
+
                                     double lastLat = Double.longBitsToDouble(mainPreference.getLong("lastSigLat",0));
                                     double lastLong = Double.longBitsToDouble(mainPreference.getLong("lastSigLong",0));
+                                    Log.i(TAG,"test"+lastLat+" "+lastLong);
 
+
+                                    //--IGNORE
+//                                    Log.e(TAG, "first location log");
+//                                    double lastLat = Double.longBitsToDouble(mainPreference.getLong("lastSigLat",0));
+//                                    double lastLong = Double.longBitsToDouble(mainPreference.getLong("lastSigLong",0));
                                     //TODO need comparison to see if current location is significantly further away than the last point
                                     //TODO now it might unnecessary as a new set of triggers will be feteched everytime MainGameActivity is launched
                                     //if it is, then update the Preference for the location
+                                    //--END IGNORE
+
+
+
+
 
                                     locationChanged = true;
                                     fighterMapView.centerAndZoom(location.getLatitude(), location.getLongitude(), 17);
@@ -222,6 +313,7 @@ public class MainGameActivity extends AppCompatActivity implements ResultCallbac
     @Override
     protected void onStart() {
         super.onStart();
+        Log.i(TAG, "attempting to connect!");
         mainGoogleApiClient.connect();
     }
 
@@ -248,15 +340,11 @@ public class MainGameActivity extends AppCompatActivity implements ResultCallbac
     private void createGeofencesfromTriggerPoints() {
         //Created a list of Geofences to populate mGeofenceList, which is passed to GeoFencingRequest
         for(int i=0; i<nearbyTriggerPointsWGS.length; i++) {
-            Geofence geo = new Geofence.Builder()
-                    .setRequestId(String.valueOf(i))
-                    .setCircularRegion(nearbyTriggerPointsWGS[i].getY(), nearbyTriggerPointsWGS[i].getX(), 200)
-                    .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER)
-                    .setExpirationDuration(1000*60*60*24)
-                    .build();
+
+            //TODO create constants for 400 and 100*60*60*24
             mGeofenceList.add(new Geofence.Builder()
                     .setRequestId(String.valueOf(i))
-                    .setCircularRegion(nearbyTriggerPointsWGS[i].getY(), nearbyTriggerPointsWGS[i].getX(), 200)
+                    .setCircularRegion(nearbyTriggerPointsWGS[i].getY(), nearbyTriggerPointsWGS[i].getX(), 400)
                     .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER)
                     .setExpirationDuration(1000*60*60*24)
                     .build());
@@ -266,6 +354,15 @@ public class MainGameActivity extends AppCompatActivity implements ResultCallbac
 
     //actually initializes the geofences with the google api
     public void addGeofence(){
+        //remove any old ones
+        removeGeofence();
+//        ArrayList<String> removalList = new ArrayList<String>();
+//        for(int i=0; i<25; ++i){
+//            removalList.add(String.valueOf(i));
+//        }
+//        LocationServices.GeofencingApi.removeGeofences(mainGoogleApiClient,removalList);
+
+        //add new ones
         LocationServices.GeofencingApi.addGeofences(mainGoogleApiClient, getGeofenceingRequest(), getGeofencePendingIntent()).setResultCallback(this);
 
     }
@@ -361,6 +458,29 @@ public class MainGameActivity extends AppCompatActivity implements ResultCallbac
 
     @Override
     public void onResult(Status status) {
-        Log.e(TAG, "Messsage: "+status.getStatusMessage());
+        if(status.isSuccess()){
+            Log.i(TAG, "Result Success");
+        }else {
+            Log.e(TAG, "Result Error Message: " + status.getStatusMessage());
+        }
+    }
+
+    @Override
+    public void onConnected(Bundle bundle) {
+        Log.i(TAG, "connected here");
+
+        if(needToUpdateTriggers) {
+            addGeofence();
+        }
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+        Log.i(TAG, "Connection suspended");
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+        Log.e(TAG, "Connection failed: ConnectionResult.getErrorCode() = " + connectionResult.getErrorCode());
     }
 }
