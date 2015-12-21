@@ -70,7 +70,7 @@ dependencies {
     compile 'com.android.support:support-v4:23.1.1'
     compile 'com.esri.arcgis.android:arcgis-android:10.2.7'
     compile 'com.firebase:firebase-client-android:2.4.0'
-    compile 'com.github.SyndicateFighter:ArcMonsters-monsters:0.1.5'
+    compile 'com.github.SyndicateFighter:ArcMonsters-monsters:0.1.4'
     compile 'com.android.support:design:23.1.1'
     compile 'com.google.android.gms:play-services:8.3.0'
     compile 'com.gordonwong:material-sheet-fab:1.2'
