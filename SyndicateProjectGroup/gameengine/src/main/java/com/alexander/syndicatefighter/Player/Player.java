@@ -2,7 +2,6 @@ package com.alexander.syndicatefighter.Player;
 
 import com.alexander.syndicatefighter.Backpack;
 import com.alexander.syndicatefighter.Worker.Worker;
-import com.sun.org.apache.bcel.internal.generic.RETURN;
 
 import java.util.ArrayList;
 import java.util.List;
