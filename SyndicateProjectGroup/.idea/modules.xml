@@ -5,6 +5,7 @@
       <module fileurl="file://$PROJECT_DIR$/SyndicateProjectGroup.iml" filepath="$PROJECT_DIR$/SyndicateProjectGroup.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/basegameutil/basegameutil.iml" filepath="$PROJECT_DIR$/basegameutil/basegameutil.iml" />
+      <module fileurl="file://$PROJECT_DIR$/gameengine/gameengine.iml" filepath="$PROJECT_DIR$/gameengine/gameengine.iml" />
     </modules>
   </component>
 </project>

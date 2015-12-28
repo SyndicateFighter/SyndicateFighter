@@ -13,10 +13,7 @@ import android.widget.TextView;
 import com.alexander.syndicatefighter.Backpack;
 import com.alexander.syndicatefighter.Item.Item;
 
-import org.w3c.dom.Text;
-
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by alex7370 on 12/28/2015.

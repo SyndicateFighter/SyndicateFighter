@@ -21,7 +21,7 @@ abstract public class Skills {
         this.costNRG = CostPerAttach;
 
         // When writing subclasses, use the following format of constructor
-        // class SubClass extends com.alexander.syndicatefighter.Skills.Skills
+        // class SubClass extends Skills
         // {
         //    public SubClass(String Name, int MaxNRG, int Cooldown, int CostPerAttach)
         //     {   super(String Name, int MaxNRG, int Cooldown, int CostPerAttach);   }
