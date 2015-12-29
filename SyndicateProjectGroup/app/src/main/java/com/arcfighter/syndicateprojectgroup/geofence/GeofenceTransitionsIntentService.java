@@ -12,8 +12,14 @@ import android.support.v4.app.TaskStackBuilder;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.alexander.syndicatefighter.Battle.BattleEventItem;
 import com.arcfighter.syndicateprojectgroup.MainGameActivity;
 import com.arcfighter.syndicateprojectgroup.R;
+import com.firebase.client.AuthData;
+import com.firebase.client.DataSnapshot;
+import com.firebase.client.Firebase;
+import com.firebase.client.FirebaseError;
+import com.firebase.client.ValueEventListener;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingEvent;
 
@@ -28,14 +34,17 @@ import java.util.List;
  * helper methods.
  */
 public class GeofenceTransitionsIntentService extends IntentService {
-    // TODO: Rename actions, choose action names that describe tasks that this
-    // IntentService can perform, e.g. ACTION_FETCH_NEW_ITEMS
-    private static final String ACTION_FOO = "com.arcfighter.syndicateprojectgroup.geofence.action.FOO";
-    private static final String ACTION_BAZ = "com.arcfighter.syndicateprojectgroup.geofence.action.BAZ";
+//    // TODO: Rename actions, choose action names that describe tasks that this
+//    // IntentService can perform, e.g. ACTION_FETCH_NEW_ITEMS
+//    private static final String ACTION_FOO = "com.arcfighter.syndicateprojectgroup.geofence.action.FOO";
+//    private static final String ACTION_BAZ = "com.arcfighter.syndicateprojectgroup.geofence.action.BAZ";
+//
+//    // TODO: Rename parameters
+//    private static final String EXTRA_PARAM1 = "com.arcfighter.syndicateprojectgroup.geofence.extra.PARAM1";
+//    private static final String EXTRA_PARAM2 = "com.arcfighter.syndicateprojectgroup.geofence.extra.PARAM2";
 
-    // TODO: Rename parameters
-    private static final String EXTRA_PARAM1 = "com.arcfighter.syndicateprojectgroup.geofence.extra.PARAM1";
-    private static final String EXTRA_PARAM2 = "com.arcfighter.syndicateprojectgroup.geofence.extra.PARAM2";
+
+    private Firebase mFirebaseRef;
 
     public GeofenceTransitionsIntentService() {
         super("GeofenceTransitionsIntentService");
@@ -73,6 +82,40 @@ public class GeofenceTransitionsIntentService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
+
+        mFirebaseRef = new Firebase("https://amber-fire-1309.firebaseio.com/");
+
+//        mFirebaseRef.addListenerForSingleValueEvent(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(DataSnapshot dataSnapshot) {
+//
+//            }
+//
+//            @Override
+//            public void onCancelled(FirebaseError firebaseError) {
+//
+//            }
+//        });
+
+
+
+        AuthData authData = mFirebaseRef.getAuth();
+        if (authData != null) {
+            // user authenticated
+            Log.i("Intent", "authenticated");
+
+            BattleEventItem bei = new BattleEventItem("456","wild","alexander");
+            mFirebaseRef.child("users").child(authData.getUid()).child("battleEventList").push().setValue(bei);
+
+
+        }else{
+            //TODO bug where if on launch user is within trigger, it will fail here, sometimes
+            Log.i("Intent", "NOT authenticated");
+        }
+        //mFirebaseRef.child("users").child(authData.getUid());
+
+
+
         GeofencingEvent geofencingEvent = GeofencingEvent.fromIntent(intent);
         if (geofencingEvent.hasError()) {
             //TODO implement error logging/catching here

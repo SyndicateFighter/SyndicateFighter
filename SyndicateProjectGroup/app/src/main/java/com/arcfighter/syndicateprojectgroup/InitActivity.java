@@ -51,13 +51,11 @@ public class InitActivity extends FragmentActivity implements
 
 
 
-
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_init);
+
 
 
 
@@ -160,6 +158,7 @@ public class InitActivity extends FragmentActivity implements
                 //mGoogleLoginClicked = false;
                 Intent resultIntent = new Intent(InitActivity.this,MainGameActivity.class);
                 if (token != null) {
+
 
 
 //                    //TODO this will need to be moved to appropriate section, most likely main game activity in the future

@@ -13,6 +13,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import com.alexander.syndicatefighter.Battle.BattleEventItem;
+import com.alexander.syndicatefighter.Battle.BattleEventList;
 import com.alexander.syndicatefighter.Player.Player;
 import com.arcfighter.syndicateprojectgroup.Triggers.Triggers;
 import com.arcfighter.syndicateprojectgroup.geofence.GeofenceTransitionsIntentService;
@@ -126,14 +128,28 @@ public class MainGameActivity extends AppCompatActivity implements GoogleApiClie
                             //TODO someone do something with firebase?
                             String provider = authData.getProvider();
                             String dispname = "No Name";
+                            String avatarUrl = "http://i.imgur.com/2OwLvMw.png";
                             if(authData.getProviderData().containsKey("displayName")) {
-                               dispname = authData.getProviderData().get("displayName").toString();
+                                dispname = authData.getProviderData().get("displayName").toString();
                             }
-                            Player newPlayer = new Player(authData.getUid(),provider,dispname);
+                            if(authData.getProviderData().containsKey("profileImageURL")){
+                                avatarUrl = authData.getProviderData().get("profileImageURL").toString();
+                            }
+                            Player newPlayer = new Player(authData.getUid(),provider,dispname, avatarUrl);
                             mFirebaseRef.child("users").child(authData.getUid()).setValue(newPlayer);
 
+                            //TODO check if first time
+                            BattleEventItem bei = new BattleEventItem("123","trainer","andrew");
+                            mFirebaseRef.child("users").child(authData.getUid()).child("battleEventList").push().setValue(bei);
 
-//                            Map<String, String> map = new HashMap<String, String>();
+                            //should look into why this is not working
+                            //BattleEventList bel = new BattleEventList();
+//                            Map<String, Object> belMap = new HashMap<String, Object>();
+//                            belMap.put("battleEventList", bel);
+//                            mFirebaseRef.child("users").child(authData.getUid()).updateChildren(belMap);
+
+
+//                            Map<String, String> map = new HashMap<String, String>();tinteni
 //                            map.put("provider", authData.getProvider());
 //                            if(authData.getProviderData().containsKey("displayName")) {
 //                                map.put("displayName", authData.getProviderData().get("displayName").toString());

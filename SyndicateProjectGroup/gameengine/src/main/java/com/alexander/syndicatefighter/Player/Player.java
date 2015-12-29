@@ -17,23 +17,23 @@ public class Player {
     private Status status;
     private Backpack backpack;
     private List<Worker> workerList;
-    private String avatar;   //TODO: Currently defined as string. Is it ok? Any better option?
+    private String avatarUrl;   //TODO: Currently defined as string. Is it ok? Any better option?
 
 
     //region Constructors
     public Player() {
-        this("123", "google", "Newplayer Changeyourname");      //TODO: 1)auto increment for ID in database, 2)default avatar and email
+        this("google:123", "google", "Newplayer Changeyourname", "http://i.imgur.com/2OwLvMw.png");      //TODO: 1)auto increment for ID in database, 2)default avatar and email
     }
 
 //    public Player(long Uid, String email, String name, String avatar) {
 //        this(Uid, email, name, Gender.Neither, 0L, Status.New, new Backpack(), new ArrayList<Worker>(), avatar);
 //    }
 
-    public Player(String Uid, String provider, String name){
-        this(Uid, provider, name, Gender.Neither, 0L, Status.New, new Backpack(), new ArrayList<Worker>(), "DEFAULT_AVATAR");
+    public Player(String Uid, String provider, String name, String avatarUrl){
+        this(Uid, provider, name, Gender.Neither, 0L, Status.New, new Backpack(), new ArrayList<Worker>(), avatarUrl);
     }
 
-    private Player(String Uid, String provider,  String name, Gender gender, long cash, Status status, Backpack backpack, List<Worker> workerList, String avatar) {
+    private Player(String Uid, String provider,  String name, Gender gender, long cash, Status status, Backpack backpack, List<Worker> workerList, String avatarUrl) {
         this.Uid = Uid;
         this.provider = provider;
         this.name = name;
@@ -42,7 +42,7 @@ public class Player {
         this.status = status;
         this.backpack = backpack;
         this.workerList = workerList;
-        this.avatar = avatar;
+        this.avatarUrl = avatarUrl;
     }
     //endregion
 
@@ -101,12 +101,12 @@ public class Player {
         this.status = status;
     }
 
-    public String getAvatar() {
-        return this.avatar;
+    public String getAvatarUrl() {
+        return this.avatarUrl;
     }
 
-    public void setAvatar(String avatar) {
-        this.avatar = avatar;
+    public void setAvatarUrl(String avatar) {
+        this.avatarUrl = avatarUrl;
     }
 
     public Backpack getBackpack() {
