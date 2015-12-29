@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import com.alexander.syndicatefighter.Player.Player;
 import com.arcfighter.syndicateprojectgroup.Triggers.Triggers;
 import com.arcfighter.syndicateprojectgroup.geofence.GeofenceTransitionsIntentService;
 import com.esri.android.map.GraphicsLayer;
@@ -39,7 +40,9 @@ import com.gordonwong.materialsheetfab.MaterialSheetFab;
 import com.gordonwong.materialsheetfab.MaterialSheetFabEventListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MainGameActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,ResultCallback<Status> {
 
@@ -119,14 +122,31 @@ public class MainGameActivity extends AppCompatActivity implements GoogleApiClie
                         @Override
                         public void onAuthenticated(AuthData authData) {
                             Log.e(TAG, "Authenticated with FIREBASE");
-                            Toast.makeText(MainGameActivity.this, "Authenticated with FIREBASE", Toast.LENGTH_SHORT).show();
+//                            Toast.makeText(MainGameActivity.this, "Authenticated with FIREBASE", Toast.LENGTH_SHORT).show();
                             //TODO someone do something with firebase?
+                            String provider = authData.getProvider();
+                            String dispname = "No Name";
+                            if(authData.getProviderData().containsKey("displayName")) {
+                               dispname = authData.getProviderData().get("displayName").toString();
+                            }
+                            Player newPlayer = new Player(authData.getUid(),provider,dispname);
+                            mFirebaseRef.child("users").child(authData.getUid()).setValue(newPlayer);
+
+
+//                            Map<String, String> map = new HashMap<String, String>();
+//                            map.put("provider", authData.getProvider());
+//                            if(authData.getProviderData().containsKey("displayName")) {
+//                                map.put("displayName", authData.getProviderData().get("displayName").toString());
+//                            }
+//                            mFirebaseRef.child("users").child(authData.getUid()).setValue(map);
+
+
                         }
 
                         @Override
                         public void onAuthenticationError(FirebaseError firebaseError) {
                             Log.e(TAG, "NOT Authenticated with FIREBASE");
-                            Toast.makeText(MainGameActivity.this, "NOT Authenticated with FIREBASE", Toast.LENGTH_SHORT).show();
+//                            Toast.makeText(MainGameActivity.this, "NOT Authenticated with FIREBASE", Toast.LENGTH_SHORT).show();
                         }
                     });
 

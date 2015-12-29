@@ -5,12 +5,12 @@ import com.alexander.syndicatefighter.Worker.Worker;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import com.google.gson.Gson;
 
 public class Player {
-    private long id;
-    private String email;
+
+    private String Uid;
+    private String provider;
     private String name;
     private Gender gender;
     private long cash;
@@ -22,16 +22,20 @@ public class Player {
 
     //region Constructors
     public Player() {
-        this(123, "player@test.com", "Newplayer Changeyourname", "DefaultAvatar");      //TODO: 1)auto increment for ID in database, 2)default avatar and email
+        this("123", "google", "Newplayer Changeyourname");      //TODO: 1)auto increment for ID in database, 2)default avatar and email
     }
 
-    public Player(long id, String email, String name, String avatar) {
-        this(id, email, name, Gender.Neither, 0L, Status.New, new Backpack(), new ArrayList<Worker>(), avatar);
+//    public Player(long Uid, String email, String name, String avatar) {
+//        this(Uid, email, name, Gender.Neither, 0L, Status.New, new Backpack(), new ArrayList<Worker>(), avatar);
+//    }
+
+    public Player(String Uid, String provider, String name){
+        this(Uid, provider, name, Gender.Neither, 0L, Status.New, new Backpack(), new ArrayList<Worker>(), "DEFAULT_AVATAR");
     }
 
-    public Player(long id, String email, String name, Gender gender, long cash, Status status, Backpack backpack, List<Worker> workerList, String avatar) {
-        this.id = id;
-        this.email = email;
+    private Player(String Uid, String provider,  String name, Gender gender, long cash, Status status, Backpack backpack, List<Worker> workerList, String avatar) {
+        this.Uid = Uid;
+        this.provider = provider;
         this.name = name;
         this.gender = gender;
         this.cash = cash;
@@ -43,20 +47,12 @@ public class Player {
     //endregion
 
     //region Public Methods for Properties
-    public long getId() {
-        return this.id;
+    public String getUid() {
+        return this.Uid;
     }
 
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public String getEmail() {
-        return this.email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
+    public void setUid(String uid) {
+        this.Uid = uid;
     }
 
     public String getName() {
@@ -153,4 +149,11 @@ public class Player {
         return jsonStr;
     }
 
+    public String getProvider() {
+        return provider;
+    }
+
+    public void setProvider(String provider) {
+        this.provider = provider;
+    }
 }
