@@ -47,9 +47,8 @@
         <activity
             android:name=".MainGameActivity"
             android:label="@string/title_activity_main_game"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:screenOrientation="portrait"></activity>
-
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".SettingsActivity"
             android:label="@string/title_activity_settings"
@@ -59,16 +58,19 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.arcfighter.syndicateprojectgroup.MainGameActivity" />
         </activity>
-
-        <activity android:name=".BackpackActivity"
-            android:screenOrientation="portrait"></activity>
-
-        <activity android:name=".TeamActivity"
-            android:screenOrientation="portrait"></activity>
+        <activity
+            android:name=".BackpackActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".TeamActivity"
+            android:screenOrientation="portrait" />
 
         <service
             android:name=".geofence.GeofenceTransitionsIntentService"
-            android:exported="false"></service>
+            android:exported="false" />
+
+        <activity android:name=".battle.BattleEventListActivity" />
+        <activity android:name=".battle.BattleActivity"></activity>
     </application>
 
 </manifest>
