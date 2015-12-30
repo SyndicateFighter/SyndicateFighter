@@ -26,5 +26,6 @@
     <dimen name="note_corner_radius">2dp</dimen>
     <dimen name="note_textsize">14sp</dimen>
     <dimen name="note_title_textsize">24sp</dimen>
+    <dimen name="text_margin">16dp</dimen>
 
 </resources>

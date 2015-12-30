@@ -13,8 +13,10 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.alexander.syndicatefighter.Battle.BattleEventItem;
+import com.alexander.syndicatefighter.Battle.BattleEventList;
 import com.arcfighter.syndicateprojectgroup.MainGameActivity;
 import com.arcfighter.syndicateprojectgroup.R;
+import com.arcfighter.syndicateprojectgroup.battle.BattleEventListActivity;
 import com.firebase.client.AuthData;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
@@ -45,6 +47,7 @@ public class GeofenceTransitionsIntentService extends IntentService {
 
 
     private Firebase mFirebaseRef;
+    private String Uid;
 
     public GeofenceTransitionsIntentService() {
         super("GeofenceTransitionsIntentService");
@@ -85,26 +88,13 @@ public class GeofenceTransitionsIntentService extends IntentService {
 
         mFirebaseRef = new Firebase("https://amber-fire-1309.firebaseio.com/");
 
-//        mFirebaseRef.addListenerForSingleValueEvent(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(DataSnapshot dataSnapshot) {
-//
-//            }
-//
-//            @Override
-//            public void onCancelled(FirebaseError firebaseError) {
-//
-//            }
-//        });
-
-
-
         AuthData authData = mFirebaseRef.getAuth();
         if (authData != null) {
             // user authenticated
             Log.i("Intent", "authenticated");
 
             BattleEventItem bei = new BattleEventItem("456","wild","alexander");
+            Uid = authData.getUid();
             mFirebaseRef.child("users").child(authData.getUid()).child("battleEventList").push().setValue(bei);
 
 
@@ -112,8 +102,6 @@ public class GeofenceTransitionsIntentService extends IntentService {
             //TODO bug where if on launch user is within trigger, it will fail here, sometimes
             Log.i("Intent", "NOT authenticated");
         }
-        //mFirebaseRef.child("users").child(authData.getUid());
-
 
 
         GeofencingEvent geofencingEvent = GeofencingEvent.fromIntent(intent);
@@ -135,19 +123,6 @@ public class GeofenceTransitionsIntentService extends IntentService {
             sendNotification(geofenceTransitionDetails);
         }
 
-
-//        if (intent != null) {
-//            final String action = intent.getAction();
-//            if (ACTION_FOO.equals(action)) {
-//                final String param1 = intent.getStringExtra(EXTRA_PARAM1);
-//                final String param2 = intent.getStringExtra(EXTRA_PARAM2);
-//                handleActionFoo(param1, param2);
-//            } else if (ACTION_BAZ.equals(action)) {
-//                final String param1 = intent.getStringExtra(EXTRA_PARAM1);
-//                final String param2 = intent.getStringExtra(EXTRA_PARAM2);
-//                handleActionBaz(param1, param2);
-//            }
-//        }
     }
 
     private String getGeofenceTransitionDetails(Context context, int geofenceTransition, List<Geofence> triggeringGeofences){
@@ -161,7 +136,7 @@ public class GeofenceTransitionsIntentService extends IntentService {
         String triggeringGeofencesIdsString = TextUtils.join(", ", triggeringGeofencesIdsList);
 
         //TODO "Entered Area" needs to go into one of those R.string
-        return "Entered Area" + ": " + triggeringGeofencesIdsString;
+        return "Encountered Monster" + ": " + triggeringGeofencesIdsString;
 
     }
 
@@ -174,9 +149,10 @@ public class GeofenceTransitionsIntentService extends IntentService {
 
         // Create an explicit content Intent that starts the main game Activity.
         //TODO consider maybe a new activity to hold a list of all events or challenges??
-        Intent notificationIntent = new Intent(getApplicationContext(), MainGameActivity.class);
+        Intent notificationIntent = new Intent(getApplicationContext(), BattleEventListActivity.class);
 
         notificationIntent.putExtra("fromactivity", "GeofenceTransitionsIntentService");
+        notificationIntent.putExtra("Uid", Uid);
 
         // Construct a task stack.
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
@@ -203,7 +179,7 @@ public class GeofenceTransitionsIntentService extends IntentService {
                         R.drawable.cast_ic_notification_0))
                 .setColor(Color.RED)
                 .setContentTitle(notificationDetails)
-                .setContentText("TEMP TEXT!!!!!")
+                .setContentText("Prepare to Battle!!")
                 .setContentIntent(notificationPendingIntent);
 
         // Dismiss notification once the user touches it.
